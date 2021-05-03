@@ -1,13 +1,15 @@
 <script>
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher, onMount } from 'svelte'
     const dispatch = createEventDispatcher();
 
     function handleURL() {
-        let val = document.getElementById("sites").value;
         dispatch('change', {
-            url: val
+            url: c ? document.getElementById('custom_url').value : selected
         })
     }
+
+    let selected;
+    $: c = selected == "custom";
 </script>
 
 <style>
@@ -41,13 +43,18 @@
     <div class="selection">
         <label for="sites">Choose a map:</label>
         <div class="drop-down">
-            <select name="sites" id="sites">
+            <select bind:value={selected} name="sites" id="sites">
+                <option value="custom">Custom URL</option>
                 <option value="https://i.redd.it/57ic5mnuza861.png">Genshin Impact</option>
-                <option value="saab">Saab</option>
-                <option value="mercedes">Mercedes</option>
-                <option value="audi">Audi</option>
+                <option value="https://wallpaperaccess.com/full/815670.jpg">Mordor</option>
+                <option value="https://i.pinimg.com/originals/b0/fa/34/b0fa349714c4aaf4fdc843ebf5df6be7.jpg">LoZ: BotW</option>
             </select>
         </div>
+        {#if c}
+        <div class="custom">
+            <input id="custom_url" type="url" placeholder="Custom map URL">
+        </div>
+        {/if}
         <button type="button" on:click={handleURL}>Submit</button>
     </div>
 </div>

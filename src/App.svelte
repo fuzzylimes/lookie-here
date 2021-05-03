@@ -1,23 +1,22 @@
 <script>
-import { afterUpdate, onMount } from "svelte";
+import { afterUpdate } from "svelte";
 import Popup from './Popup.svelte';
 import Landing from './Landing.svelte';
 
 	let display = false;
-	let map_url, map;
+	let map_url, map, markers;
 
+	const urlParams = new URLSearchParams(window.location.search);
+	const query = urlParams.get('q');
+	if (query) display = true;
 	
 	afterUpdate(() => {
 		console.log("Update Triggered")
-		if (display && map_url) {
+		if (display) {
 			setmap();
 		}
 	}) 
-	
-	onMount(() => {
-		console.log("Mount triggered")
-	})
-	
+
 	const setURL = ({detail}) => {
 		map_url = detail.url
 		display = true;
@@ -25,11 +24,10 @@ import Landing from './Landing.svelte';
 	
 	const encodeURL = '/api/encode';
 	const decodeURL = '/api/decode';
-	const urlParams = new URLSearchParams(window.location.search);
-	const query = urlParams.get('q');
 	
-	if (query !== null) {
-		fetch(decodeURL, {
+	async function decode() {
+		console.log("Query is set");
+		return fetch(decodeURL, {
 			headers: { "content-type": "text/plain" },
 			body: query,
 			method: "POST"
@@ -38,19 +36,18 @@ import Landing from './Landing.svelte';
 		.then(res => {
 			console.log(res);
 			map_url = res.url;
-			configure_map();
-			let markers = res.markers;
-			markers.forEach(element => {
-				addToMap(element.id, element.latlong, element.note)
-			});
+			markers = res.markers;
 		})
-		.catch(error => { console.error(error) })
-		display = true;
+		.catch(error => { console.error(error) }) 
 	}
 
-	function setmap() {
+	async function setmap() {
+		if(query) {
+			await decode();
+		}
 		configure_map()
 		console.log("image set to url")
+
 		// Handle export button
 		var ex = document.getElementById('export');
 		ex.addEventListener('click', (event) => {
@@ -117,7 +114,13 @@ import Landing from './Landing.svelte';
 			var bounds = [[0, 0], [2110, 2469]];
 			// var image = L.imageOverlay("https://i.redd.it/57ic5mnuza861.png", bounds).addTo(map);
 			var image = L.imageOverlay(map_url, bounds).addTo(map);
-		
+
+			// Add in the markers
+			if(markers) {
+				markers.forEach(element => {
+					addToMap(element.id, element.latlong, element.note)
+				});
+			}
 	}
 
 	let markerObs = []
