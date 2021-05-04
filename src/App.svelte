@@ -22,8 +22,8 @@ import Landing from './Landing.svelte';
 		display = true;
 	}
 	
-	const encodeURL = '/api/encode';
-	const decodeURL = '/api/decode';
+	const encodeURL = '/api/map?m=encode';
+	const decodeURL = '/api/map?m=decode';
 	
 	async function decode() {
 		console.log("Query is set");
