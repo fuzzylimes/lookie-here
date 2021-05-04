@@ -19,11 +19,6 @@
         color: white;
     }
 
-    .selection {
-        font-size: 2rem;
-        text-align: center;
-    }
-
     .center {
         height: 100vh;
         width: 100vw;
@@ -32,17 +27,13 @@
         justify-content: center;
     }
 
-    .drop-down {
-        font-size: 2rem;
-    }
-
 
 </style>
 
 <div class="center">
-    <div class="selection">
-        <label for="sites">Choose a map:</label>
-        <div class="drop-down">
+    <div>
+        <div class="title has-text-white">Choose a map:</div>
+        <div class="select">
             <select bind:value={selected} name="sites" id="sites">
                 <option value="custom">Custom URL</option>
                 <option value="https://i.redd.it/57ic5mnuza861.png">Genshin Impact</option>
@@ -52,9 +43,11 @@
         </div>
         {#if c}
         <div class="custom">
-            <input id="custom_url" type="url" placeholder="Custom map URL">
+            <input class="input" id="custom_url" type="url" placeholder="Custom map URL">
         </div>
         {/if}
-        <button type="button" on:click={handleURL}>Submit</button>
+        <div class="container">
+            <button class="button is-link" type="button" on:click={handleURL}>Submit</button>
+        </div>
     </div>
 </div>

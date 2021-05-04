@@ -247,8 +247,12 @@ import Landing from './Landing.svelte';
 	{#if display}
 	<div class="map">
         <div id="mapid">
-            <button id="export" class="button export">Export</button>
-            <button id="reset" class="button reset">Reset</button>
+			<div class="map-button export">
+				<button id="export" class="button is-link"><i class="fas fa-file-export"></i></button>
+			</div>
+			<div class="map-button reset">
+				<button id="reset" class="button is-danger"><i class="fas fa-undo"></i></button>
+			</div>
         </div>
     </div>
     <!-- The Modal -->
