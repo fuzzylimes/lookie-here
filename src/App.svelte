@@ -4,7 +4,7 @@ import Popup from './Popup.svelte';
 import Landing from './Landing.svelte';
 
 	let display = false;
-	let map_url, map, markers;
+	let map_url, map, markers, link, modal;
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const query = urlParams.get('q');
@@ -38,7 +38,10 @@ import Landing from './Landing.svelte';
 			map_url = res.url;
 			markers = res.markers;
 		})
-		.catch(error => { console.error(error) }) 
+		.catch(error => { 
+			console.error(error);
+			document.location.href = '/';
+		}) 
 	}
 
 	async function setmap() {
@@ -62,7 +65,8 @@ import Landing from './Landing.svelte';
 			.then(data => {return data.json()})
 			.then(res => {
 				console.log(res);
-				message_text.innerHTML = `<a href="/?q=${res.d}">Copy Link</a>`
+				link = `${window.location.host}/?q=${res.d}`;
+				// message_text.innerHTML = `<a href="/?q=${res.d}">Copy Link</a>`
 				modal.style.display = "block";
 			})
 			.catch(error => {console.error(error)})
@@ -78,28 +82,20 @@ import Landing from './Landing.svelte';
 
 		map.on('click', onMapClick);
 
-		var modal = document.getElementById("myModal");
+		// var message_text = document.getElementById("modal_text");
 
-		// Get the button that opens the modal
-		var btn = document.getElementById("myBtn");
-
-		// Get the <span> element that closes the modal
-		var span = document.getElementsByClassName("close")[0];
-
-		var message_text = document.getElementById("modal_text");
-
-		// When the user clicks on <span> (x), close the modal
-		span.onclick = function () {
-			modal.style.display = "none";
-		}
-
-		// When the user clicks anywhere outside of the modal, close it
-		window.onclick = function (event) {
-			event.stopPropagation();
-			if (event.target == modal) {
-				modal.style.display = "none";
+		modal = document.querySelector('.modal');
+		const close = document.querySelector('.modal-close')
+	
+		close.addEventListener('click',function () {
+			modal.style.display = 'none'
+		})
+	
+		window.addEventListener('click',function (event) {
+			if (event.target.className === 'modal-background') {
+				modal.style.display = 'none'
 			}
-		}
+		})
 	}
 
 	function configure_map() {
@@ -141,8 +137,6 @@ import Landing from './Landing.svelte';
 	}
 
 	function addToMap(id, latlng, note) {
-		// let n = `${note}<br><button on:click="{() => clearMarker(${id})}">Remove</button>`;
-		// let marker = L.marker(latlng).addTo(map).bindPopup(n);
 
 		let marker = L.marker(latlng);
 		bindPopup(marker, (m) => {
@@ -208,8 +202,6 @@ import Landing from './Landing.svelte';
 	// map.setView(, -1);
 
 	function onMapClick(e) {
-		// marker = L.marker(e.latlng).addTo(map)
-		//     .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
 		addToMap(getNextId(), e.latlng, null)
 	}
 
@@ -238,7 +230,21 @@ import Landing from './Landing.svelte';
 			markers: marks
 		}
 		return JSON.stringify(payload);
-		// return btoa(JSON.stringify(marks)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+	}
+
+	function ToClipboard () {
+		var dummy = document.createElement("textarea");
+		document.body.appendChild(dummy);
+		dummy.value = link;
+		dummy.select();
+		document.execCommand("copy");
+		document.body.removeChild(dummy);
+		modal.style.display = 'none';
+		bulmaToast.toast({ 
+			message: 'Copied to clipboard!',
+			type: 'is-primary',
+  			position: 'center'
+		});
 	}
 </script>
 
@@ -248,7 +254,7 @@ import Landing from './Landing.svelte';
 	<div class="map">
         <div id="mapid">
 			<div class="map-button export">
-				<button id="export" class="button is-link"><i class="fas fa-file-export"></i></button>
+				<button aria-label="Export Map" id="export" class="button is-link"><i class="fas fa-file-export"></i></button>
 			</div>
 			<div class="map-button reset">
 				<button id="reset" class="button is-danger"><i class="fas fa-undo"></i></button>
@@ -257,14 +263,13 @@ import Landing from './Landing.svelte';
     </div>
     <!-- The Modal -->
     <div id="myModal" class="modal">
-    
-        <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="modal_text">Some text in the Modal..</p>
-        </div>
-    
-    </div>
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<h1 class="title">Sharable Link</h1>
+			<div class="button" on:click={ToClipboard}>Copy Link</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close"></button>
+	</div>
 	{:else}
 	<div>
 		<Landing on:change={setURL}/>
@@ -275,5 +280,61 @@ import Landing from './Landing.svelte';
 </main>
 
 <style>
+	.modal {
+		z-index: 1001;
+		/* display: none; Hidden by default */
+		position: fixed; /* Stay in place */
+		/* z-index: 1000; Sit on top */
+		padding-top: 100px; /* Location of the box */
+		left: 0;
+		top: 0;
+		width: 100%; /* Full width */
+		height: 100%; /* Full height */
+		overflow: auto; /* Enable scroll if needed */
+		background-color: rgb(0,0,0); /* Fallback color */
+		background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	}
+
+	.map {
+		z-index: -1;
+	}
+
+	.map-button{
+		display: flex;
+		align-items: center;
+		position: absolute;
+		opacity: 1;
+		text-align: center;
+		z-index: 1001;
+	}
+	.map-button:hover{
+		opacity: .9;
+		cursor: pointer;
+	}
+	.export {
+		top: 10px;
+		right: 10px;
+		/* width: 50px; */
+		height: 40px;
+	}
+
+	.export .button {
+	max-width: 50px;
+	}
+	.reset {
+		top: 60px;
+		right: 10px;
+		/* width: 70px; */
+		height: 40px;
+	}
+
+	/* Modal Content */
+	.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 50vw;
+	}
 	
 </style>
