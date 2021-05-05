@@ -73,6 +73,7 @@ And the flow for loading an exported map works the same, only in reverse:
 * Bulma
 * Bulma-toast
 * Fontawesome
+* Go
 
 > Icons and favicon provided by [fontawesome](https://fontawesome.com/). No modifications were
 made to their icons. [Licensing terms](https://fontawesome.com/license).
