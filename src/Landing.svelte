@@ -13,12 +13,6 @@
 </script>
 
 <style>
-
-    /* :global(body) {
-        background-color: black;
-        color: white;
-    } */
-
     #custom_url {
         max-width: 60%;
     }
@@ -50,7 +44,7 @@
         <div class="container">
             <div class="columns is-vcentered is-centered">
                 <div class="column is-half-tablet is two-thirds-widescreen has-text-centered mb-5-mobile">
-                    <h1 class="title is-2 is-spaced has-text-white is-uppercase">
+                    <h1 class="title is-1 is-spaced has-text-white is-uppercase">
                         Lookie-Here!
                     </h1>
                     <div class="subtitle is-4 has-text-white">
@@ -64,7 +58,6 @@
                 </div>
                 <div class="column is-half-tablet is two-thirds-widescreen has-text-centered">
                     <div class="container">
-                        <div class="title has-text-white">Choose a map:</div>
                         <div class="select mb-4">
                             <select bind:value={selected} name="sites" id="sites">
                                 <option value="custom">Custom URL</option>
@@ -76,11 +69,6 @@
                         {#if c}
                         <input class="input" id="custom_url" type="url" placeholder="Custom map URL">
                         {/if}
-                        <!-- {#if c}
-                        <div class="custom">
-                            <input class="input" id="custom_url" type="url" placeholder="Custom map URL">
-                        </div>
-                        {/if} -->
                         <div class="container pt-4">
                             <button class="button is-link" type="button" on:click={handleURL}>Get Started!</button>
                         </div>

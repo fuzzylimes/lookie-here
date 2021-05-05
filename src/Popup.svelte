@@ -6,29 +6,27 @@
     let edit = false;
 
     const note_update = () => {
-            console.log("Hit!")
             dispatch('change', note)
+            edit = ! edit;
         }
-    
-    // document.addEventListener('DOMContentLoaded', function(){
-    //     const text_tag = document.getElementById("txt")
-    //     text_tag.addEventListener('click', () => {
-    //         edit = true;
-    //     })
-    // });
 </script>
 
 <style>
     .text-area {
-        padding: .5rem;
         text-align: center;
     }
+    .scroll {
+        white-space: pre-line;
+        min-width: 150px;
+    }
+
 </style>
 
 <div>
     <div class="text-area">
         {#if edit}
-        <textarea placeholder="Enter any details" bind:value={note} on:keypress={note_update}></textarea>
+        <textarea class="textarea" placeholder="Enter any details" bind:value={note}></textarea>
+        <div class="button is-small is-link is-light mt-1" on:click={note_update}>Save</div>
         {:else}
         <div on:click={() => edit = true} class="scroll">
             {note ? note : "Click to add a note"}

@@ -11,7 +11,6 @@ import Landing from './Landing.svelte';
 	if (query) display = true;
 	
 	afterUpdate(() => {
-		console.log("Update Triggered")
 		if (display) {
 			setmap();
 		}
@@ -26,7 +25,7 @@ import Landing from './Landing.svelte';
 	const decodeURL = '/api/map?m=decode';
 	
 	async function decode() {
-		console.log("Query is set");
+		// console.log("Query is set");
 		return fetch(decodeURL, {
 			headers: { "content-type": "text/plain" },
 			body: query,
@@ -34,7 +33,7 @@ import Landing from './Landing.svelte';
 		})
 		.then(data => { return data.json() })
 		.then(res => {
-			console.log(res);
+			// console.log(res);
 			map_url = res.url;
 			markers = res.markers;
 		})
@@ -49,14 +48,14 @@ import Landing from './Landing.svelte';
 			await decode();
 		}
 		configure_map()
-		console.log("image set to url")
+		// console.log("image set to url")
 
 		// Handle export button
 		var ex = document.getElementById('export');
 		ex.addEventListener('click', (event) => {
 			event.stopPropagation();
 			let marks = buildMapping();
-			console.log(marks);
+			// console.log(marks);
 			fetch(encodeURL, {
 				headers: {"content-type": "application/json"},
 				body: marks,
@@ -64,9 +63,8 @@ import Landing from './Landing.svelte';
 			})
 			.then(data => {return data.json()})
 			.then(res => {
-				console.log(res);
+				// console.log(res);
 				link = `${window.location.host}/?q=${res.d}`;
-				// message_text.innerHTML = `<a href="/?q=${res.d}">Copy Link</a>`
 				showModal();
 			})
 			.catch(error => {console.error(error)})
@@ -99,7 +97,7 @@ import Landing from './Landing.svelte';
 	}
 
 	function configure_map() {
-			console.log("setmap triggered")
+			// console.log("setmap triggered")
 			map = L.map('mapid', {
 				crs: L.CRS.Simple,
 				minZoom: -1,
@@ -123,7 +121,7 @@ import Landing from './Landing.svelte';
 
 	// Handle query
 	function clearMarker(id) {
-		console.log(`removing ${id}`)
+		// console.log(`removing ${id}`)
 		let new_markers = []
 		markerObs.forEach(marker => {
 			if(marker._id === id) {
@@ -133,7 +131,7 @@ import Landing from './Landing.svelte';
 			}
 		})
 		markerObs = new_markers;
-		console.log(markerObs)
+		// console.log(markerObs)
 	}
 
 	function addToMap(id, latlng, note) {
@@ -144,10 +142,11 @@ import Landing from './Landing.svelte';
 				target: m,
 				props: {
 					note: note ? note : marker.note,
-				}
+				},
+				maxHeight: 225,
+				maxWidth: 255,
 			});
 			c.$on('change', ({detail}) => {
-				console.log("THIS CHANGED")
 				updateNote(id, detail);
 			});
 			return c;
@@ -158,17 +157,17 @@ import Landing from './Landing.svelte';
 			clearMarker(this._id);
 		});
 		markerObs.push(marker)
-		console.log(markerObs)
+		// console.log(markerObs)
 	}
 
 	function updateNote(id, note) {
-		console.log(id, note)
+		// console.log(id, note)
 		markerObs.forEach(marker => {
 			if(marker._id === id) {
 				marker.note = note;
 			}
 		});
-		console.log(markerObs)
+		// console.log(markerObs)
 	}
 
 	function bindPopup(marker, createFn) {
@@ -187,7 +186,6 @@ import Landing from './Landing.svelte';
 				setTimeout(() => {
 					old.$destroy();
 				}, 500);
-
 			}
 		});
 	}
@@ -199,18 +197,21 @@ import Landing from './Landing.svelte';
 		markerObs = []
 	}
 
-	// map.setView(, -1);
-
 	function onMapClick(e) {
+		let popups = document.querySelector('.leaflet-popup-close-button');
+		if (popups) {
+			popups.click();
+			return;
+		}
 		addToMap(getNextId(), e.latlng, null)
 	}
 
 	function getNextId() {
 		let ids = markerObs.map(e => e._id)
 		for (let count = 1; count <= markerObs.length; count++) {
-		if (!ids.includes(count)) {
-			return count
-		}
+			if (!ids.includes(count)) {
+				return count
+			}
 		}
 		return markerObs.length + 1;
 	}
@@ -220,11 +221,11 @@ import Landing from './Landing.svelte';
 		markerObs.forEach(m => {
 			marks.push({
 				id: m._id,
-				latlong: [m._latlng.lat, m._latlng.lng],
+				latlong: [Math.ceil(m._latlng.lat), Math.ceil(m._latlng.lng)],
 				note: m.note
 			})
 		})
-		console.log(marks)
+		// console.log(marks)
 		let payload = {
 			url: map_url,
 			markers: marks
@@ -242,7 +243,7 @@ import Landing from './Landing.svelte';
 		showModal();
 		bulmaToast.toast({ 
 			message: 'Copied to clipboard!',
-			type: 'is-primary',
+			type: 'is-link',
   			position: 'center'
 		});
 	}
@@ -328,6 +329,11 @@ import Landing from './Landing.svelte';
 		border-radius: 15px;
 		/* width: 50vw; */
 		z-index: 1002;
+	}
+
+	.modal-background {
+		height: 100vh;
+		width: 100vw;
 	}
 
 	.modal {
