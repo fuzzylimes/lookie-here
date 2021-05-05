@@ -67,7 +67,7 @@ import Landing from './Landing.svelte';
 				console.log(res);
 				link = `${window.location.host}/?q=${res.d}`;
 				// message_text.innerHTML = `<a href="/?q=${res.d}">Copy Link</a>`
-				modal.style.display = "block";
+				showModal();
 			})
 			.catch(error => {console.error(error)})
 		});
@@ -88,12 +88,12 @@ import Landing from './Landing.svelte';
 		const close = document.querySelector('.modal-close')
 	
 		close.addEventListener('click',function () {
-			modal.style.display = 'none'
+			showModal();
 		})
 	
 		window.addEventListener('click',function (event) {
 			if (event.target.className === 'modal-background') {
-				modal.style.display = 'none'
+				showModal();
 			}
 		})
 	}
@@ -239,13 +239,19 @@ import Landing from './Landing.svelte';
 		dummy.select();
 		document.execCommand("copy");
 		document.body.removeChild(dummy);
-		modal.style.display = 'none';
+		showModal();
 		bulmaToast.toast({ 
 			message: 'Copied to clipboard!',
 			type: 'is-primary',
   			position: 'center'
 		});
 	}
+
+	function showModal() {
+		document.querySelector('html').classList.toggle('is-clipped');
+		modal.classList.toggle("is-active");
+	}
+
 </script>
 
 <main>
@@ -262,11 +268,11 @@ import Landing from './Landing.svelte';
         </div>
     </div>
     <!-- The Modal -->
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal has-text-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<h1 class="title">Sharable Link</h1>
-			<div class="button" on:click={ToClipboard}>Copy Link</div>
+			<div class="button is-link" on:click={ToClipboard}>Copy To Clipboard</div>
 		</div>
 		<button class="modal-close is-large" aria-label="close"></button>
 	</div>
@@ -280,21 +286,6 @@ import Landing from './Landing.svelte';
 </main>
 
 <style>
-	.modal {
-		z-index: 1001;
-		/* display: none; Hidden by default */
-		position: fixed; /* Stay in place */
-		/* z-index: 1000; Sit on top */
-		padding-top: 100px; /* Location of the box */
-		left: 0;
-		top: 0;
-		width: 100%; /* Full width */
-		height: 100%; /* Full height */
-		overflow: auto; /* Enable scroll if needed */
-		background-color: rgb(0,0,0); /* Fallback color */
-		background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-	}
-
 	.map {
 		z-index: -1;
 	}
@@ -330,11 +321,18 @@ import Landing from './Landing.svelte';
 
 	/* Modal Content */
 	.modal-content {
-	background-color: #fefefe;
-	margin: auto;
-	padding: 20px;
-	border: 1px solid #888;
-	width: 50vw;
+		background-color: #fefefe;
+		margin: auto;
+		padding: 20px;
+		border: 1px solid #888;
+		border-radius: 15px;
+		/* width: 50vw; */
+		z-index: 1002;
+	}
+
+	.modal {
+		z-index: 1005;
+		background-color: aliceblue;
 	}
 	
 </style>
