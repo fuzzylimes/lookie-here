@@ -100,15 +100,19 @@ import Landing from './Landing.svelte';
 			// console.log("setmap triggered")
 			map = L.map('mapid', {
 				crs: L.CRS.Simple,
-				minZoom: -1,
+				minZoom: -2,
 				maxZoom: 2,
-				zoom: 0,
-				center: [1000, 1200]
+				zoom: -1,
+				center: [0, 0]
 			});
-			var bounds = [[0, 0], [2110, 2469]];
-			// var image = L.imageOverlay("https://i.redd.it/57ic5mnuza861.png", bounds).addTo(map);
-			var image = L.imageOverlay(map_url, bounds).addTo(map);
-
+			const img = new Image();
+			img.onload = function() {
+				var bounds = [[0, 0], [this.height, this.width]];
+				var image = L.imageOverlay(map_url, bounds).addTo(map);
+				map.panTo(new L.LatLng(Math.ceil(this.height/2), Math.ceil(this.width/2)));
+			}
+			img.src = map_url;
+			
 			// Add in the markers
 			if(markers) {
 				markers.forEach(element => {
@@ -261,7 +265,7 @@ import Landing from './Landing.svelte';
 	<div class="map">
         <div id="mapid">
 			<div class="map-button export">
-				<button aria-label="Export Map" id="export" class="button is-link"><i class="fas fa-file-export"></i></button>
+				<button aria-label="Export Map" id="export" class="button is-link"><i class="fas fa-link"></i></button>
 			</div>
 			<div class="map-button reset">
 				<button id="reset" class="button is-danger"><i class="fas fa-undo"></i></button>

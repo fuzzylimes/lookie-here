@@ -62,8 +62,9 @@
                             <select bind:value={selected} name="sites" id="sites">
                                 <option value="custom">Custom URL</option>
                                 <option value="https://i.redd.it/57ic5mnuza861.png">Genshin Impact</option>
-                                <option value="https://wallpaperaccess.com/full/815670.jpg">Mordor</option>
+                                <option value="https://wallpaperaccess.com/full/815670.jpg">Middle Earth</option>
                                 <option value="https://i.pinimg.com/originals/b0/fa/34/b0fa349714c4aaf4fdc843ebf5df6be7.jpg">LoZ: BotW</option>
+                                <option value="https://i.redd.it/xyku7bwig5b11.jpg">Fortnite</option>
                             </select>
                         </div>
                         {#if c}
