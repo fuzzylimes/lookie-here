@@ -4,7 +4,7 @@ import Popup from './Popup.svelte';
 import Landing from './Landing.svelte';
 
 	let display = false;
-	let map_url, map, markers, link, modal;
+	let map_url, map, markers, link, export_modal, help_modal;
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const query = urlParams.get('q');
@@ -64,8 +64,8 @@ import Landing from './Landing.svelte';
 			.then(data => {return data.json()})
 			.then(res => {
 				// console.log(res);
-				link = `${window.location.host}/?q=${res.d}`;
-				showModal();
+				link = `${window.location.protocol}//${window.location.host}/?q=${res.d}`;
+				toggleModal(export_modal);
 			})
 			.catch(error => {console.error(error)})
 		});
@@ -82,16 +82,22 @@ import Landing from './Landing.svelte';
 
 		// var message_text = document.getElementById("modal_text");
 
-		modal = document.querySelector('.modal');
-		const close = document.querySelector('.modal-close')
+		export_modal = document.querySelector('#export-modal');
+		help_modal = document.querySelector('#help-modal');
+		const close_export = document.querySelector('#export-modal-close')
+		const close_help = document.querySelector('#help-modal-close')
 	
-		close.addEventListener('click',function () {
-			showModal();
+		close_export.addEventListener('click',function () {
+			toggleModal(export_modal);
+		})
+
+		close_help.addEventListener('click',function () {
+			toggleModal(help_modal);
 		})
 	
 		window.addEventListener('click',function (event) {
-			if (event.target.className === 'modal-background') {
-				showModal();
+			if (event.target.className.includes('modal-background')) {
+				toggleModal(event.target.parentNode);
 			}
 		})
 	}
@@ -244,7 +250,7 @@ import Landing from './Landing.svelte';
 		dummy.select();
 		document.execCommand("copy");
 		document.body.removeChild(dummy);
-		showModal();
+		toggleModal(export_modal);
 		bulmaToast.toast({ 
 			message: 'Copied to clipboard!',
 			type: 'is-link',
@@ -252,9 +258,14 @@ import Landing from './Landing.svelte';
 		});
 	}
 
-	function showModal() {
+	function toggleModal(e) {
 		document.querySelector('html').classList.toggle('is-clipped');
-		modal.classList.toggle("is-active");
+		e.classList.toggle("is-active");
+	}
+
+	function toggleHelp(e) {
+		e.stopPropagation();
+		toggleModal(help_modal);
 	}
 
 </script>
@@ -270,16 +281,42 @@ import Landing from './Landing.svelte';
 			<div class="map-button reset">
 				<button id="reset" class="button is-danger"><i class="fas fa-undo"></i></button>
 			</div>
+			<div class="map-button help">
+				<button id="help" class="button is-info" on:click={toggleHelp}><i class="far fa-question-circle"></i></button>
+			</div>
         </div>
     </div>
     <!-- The Modal -->
-    <div id="myModal" class="modal has-text-centered">
+    <div id="export-modal" class="modal has-text-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<h1 class="title">Sharable Link</h1>
 			<div class="button is-link" on:click={ToClipboard}>Copy To Clipboard</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close"></button>
+		<button id="export-modal-close" class="modal-close is-large" aria-label="close"></button>
+	</div>
+	<div class="modal" id="help-modal">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+				<p class="modal-card-title">Lookie-Here - Help</p>
+			</header>
+			<section class="modal-card-body">
+				<p class="title is-3">Placing Pins</p>
+				<p>To place pins, simply click/tap on the screen. A pin shoud appear under where you clicked/tapped.
+				</p>
+				<p class="title is-3 mt-3">Adding Notes</p>
+				<p>You can add optional notes to your pins. Click/tap on a pin after it has been placed and then click/tap in the text box to add a note. Enter anything you want and press save. Notes will be included when sharing.</p>
+				<p class="title is-3 mt-3">Deleting Pins</p>
+				<p>Individual pins can be deleted by double clicking/tapping on a pin.</p>
+				<p>All pins can be removed by clicking on the <i class="fas fa-undo"></i> button.</p>
+				<p class="title is-3 mt-3">Sharing Link</p>
+				<p>To generate a link to your map, click on the <i class="fas fa-link"></i> button, and press the "Copy to Clipboard" button in the pop up. Your sharable link will be in your active clipboard to be pasted.</p>
+			</section>
+			<footer class="modal-card-foot">
+			<button id="help-modal-close" class="button">Close</button>
+			</footer>
+		</div>
 	</div>
 	{:else}
 	<div>
@@ -302,6 +339,8 @@ import Landing from './Landing.svelte';
 		opacity: 1;
 		text-align: center;
 		z-index: 1001;
+		right: 10px;
+		height: 40px;
 	}
 	.map-button:hover{
 		opacity: .9;
@@ -309,19 +348,15 @@ import Landing from './Landing.svelte';
 	}
 	.export {
 		top: 10px;
-		right: 10px;
-		/* width: 50px; */
-		height: 40px;
 	}
-
 	.export .button {
 	max-width: 50px;
 	}
 	.reset {
 		top: 60px;
-		right: 10px;
-		/* width: 70px; */
-		height: 40px;
+	}
+	.help {
+		top: 110px;
 	}
 
 	/* Modal Content */
@@ -336,13 +371,17 @@ import Landing from './Landing.svelte';
 	}
 
 	.modal-background {
-		height: 100vh;
-		width: 100vw;
+		height: 100%;
+		width: 100%;
+		z-index: 1001;
 	}
 
 	.modal {
 		z-index: 1005;
-		background-color: aliceblue;
+	}
+
+	.modal-card {
+		z-index: inherit;
 	}
 	
 </style>
